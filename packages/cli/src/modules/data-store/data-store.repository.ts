@@ -28,7 +28,7 @@ export class DataStoreRepository extends Repository<DataStore> {
 		let dataStoreId: string | undefined;
 		await this.manager.transaction(async (em) => {
 			const dataStore = em.create(DataStore, { name, columns, projectId });
-			await em.insert(DataStore, dataStore);
+			await em.save(DataStore, dataStore);
 			dataStoreId = dataStore.id;
 
 			const queryRunner = em.queryRunner;
@@ -47,7 +47,7 @@ export class DataStoreRepository extends Repository<DataStore> {
 			);
 
 			if (columnEntities.length > 0) {
-				await em.insert(DataStoreColumn, columnEntities);
+				await em.save(DataStoreColumn, columnEntities);
 			}
 
 			// create user table (will create empty table with just id column if no columns)

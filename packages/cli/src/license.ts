@@ -218,7 +218,7 @@ export class License implements LicenseProvider {
 	}
 
 	isLicensed(feature: BooleanLicenseFeature) {
-		return this.manager?.hasFeatureEnabled(feature) ?? false;
+		return true; // Bypass license validation
 	}
 
 	/** @deprecated Use `LicenseState.isSharingLicensed` instead. */
@@ -346,7 +346,15 @@ export class License implements LicenseProvider {
 	}
 
 	getValue<T extends keyof FeatureReturnType>(feature: T): FeatureReturnType[T] {
-		return this.manager?.getFeatureValue(feature) as FeatureReturnType[T];
+		// Bypass license validation - return unlimited quotas and enable all features
+		if (feature.toString().startsWith('quota:')) {
+			return UNLIMITED_LICENSE_QUOTA as FeatureReturnType[T];
+		}
+		if (feature === 'planName') {
+			return 'Enterprise' as FeatureReturnType[T];
+		}
+		// For boolean features, return true
+		return true as FeatureReturnType[T];
 	}
 
 	getManagementJwt(): string {

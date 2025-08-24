@@ -117,9 +117,11 @@ export class AiController {
 	async chat(req: AuthenticatedRequest, res: FlushableResponse, @Body payload: AiChatRequestDto) {
 		try {
 			const aiResponse = await this.aiService.chat(payload, req.user);
-			if (aiResponse.body) {
+
+			// Handle streaming response (original n8n AI Assistant SDK)
+			if (aiResponse && typeof aiResponse === 'object' && 'body' in aiResponse && aiResponse.body) {
 				res.header('Content-type', 'application/json-lines').flush();
-				await aiResponse.body.pipeTo(
+				await (aiResponse as any).body.pipeTo(
 					new WritableStream({
 						write(chunk) {
 							res.write(chunk);
@@ -128,6 +130,11 @@ export class AiController {
 					}),
 				);
 				res.end();
+			}
+			// Handle non-streaming response (custom OpenAI-compatible service)
+			else {
+				res.header('Content-type', 'application/json');
+				res.json(aiResponse);
 			}
 		} catch (e) {
 			assert(e instanceof Error);

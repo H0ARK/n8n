@@ -28,15 +28,20 @@ export class LicenseState {
 	// --------------------
 
 	isLicensed(feature: BooleanLicenseFeature) {
-		this.assertProvider();
-
-		return this.licenseProvider.isLicensed(feature);
+		// Bypass license validation - always return true for all features
+		return true;
 	}
 
 	getValue<T extends keyof FeatureReturnType>(feature: T): FeatureReturnType[T] {
-		this.assertProvider();
-
-		return this.licenseProvider.getValue(feature);
+		// Bypass license validation - return unlimited quotas and enable all features
+		if (feature.toString().startsWith('quota:')) {
+			return UNLIMITED_LICENSE_QUOTA as FeatureReturnType[T];
+		}
+		if (feature === 'planName') {
+			return 'Enterprise' as FeatureReturnType[T];
+		}
+		// For boolean features, return true
+		return true as FeatureReturnType[T];
 	}
 
 	// --------------------

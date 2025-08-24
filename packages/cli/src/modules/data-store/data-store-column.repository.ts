@@ -55,7 +55,7 @@ export class DataStoreColumnRepository extends Repository<DataStoreColumn> {
 				dataStoreId,
 			});
 
-			await em.insert(DataStoreColumn, column);
+			await em.save(DataStoreColumn, column);
 
 			const queryRunner = em.queryRunner;
 			if (!queryRunner) {
